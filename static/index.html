@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RiskFlow // Credit Scoring Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="dark-theme">
+    <div class="app-container">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="brand">
+                <i class="fa-solid fa-shield-halved logo-icon"></i>
+                <div class="brand-text">
+                    <h1>RiskFlow</h1>
+                    <span>CREDIT INTELLIGENCE</span>
+                </div>
+            </div>
+            <div class="header-controls">
+                <label for="algorithm-select">Predictive Model:</label>
+                <select id="algorithm-select" class="custom-select">
+                    <option value="random_forest" selected>Random Forest Classifier</option>
+                    <option value="decision_tree">Decision Tree Classifier</option>
+                    <option value="logistic_regression">Logistic Regression</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="dashboard-grid">
+            
+            <!-- Row 1: Performance Charts -->
+            <section class="charts-row">
+                <div class="card glass-panel metrics-card">
+                    <div class="card-header">
+                        <h2>Model Performance Metrics</h2>
+                        <span class="tag">Comparison</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-metrics"></canvas>
+                    </div>
+                </div>
+
+                <div class="card glass-panel roc-card">
+                    <div class="card-header">
+                        <h2>ROC Curves Comparison</h2>
+                        <span class="tag">Sensitivity</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-roc"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Row 2: Credit Estimator Form & Result -->
+            <section class="estimator-row">
+                
+                <!-- Left: Sliders Form -->
+                <div class="card glass-panel form-card">
+                    <div class="card-header">
+                        <h2>Applicant Profile Estimator</h2>
+                        <p class="subtitle">Adjust parameters to calculate default risk in real-time.</p>
+                    </div>
+                    <form id="estimator-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="input-age">Age: <span id="val-age" class="val-display">35</span></label>
+                                <input type="range" id="input-age" min="18" max="75" value="35" class="slider">
+                            </div>
+                            <div class="form-group">
+                                <label for="input-history">Credit History: <span id="val-history" class="val-display">10 yrs</span></label>
+                                <input type="range" id="input-history" min="0" max="35" value="10" class="slider">
+                            </div>
+                            <div class="form-group">
+                                <label for="input-income">Annual Income: <span id="val-income" class="val-display">$60,000</span></label>
+                                <input type="range" id="input-income" min="15000" max="250000" step="1000" value="60000" class="slider">
+                            </div>
+                            <div class="form-group">
+                                <label for="input-debt">Total Debt: <span id="val-debt" class="val-display">$18,000</span></label>
+                                <input type="range" id="input-debt" min="0" max="180000" step="500" value="18000" class="slider">
+                            </div>
+                            <div class="form-group">
+                                <label for="input-savings">Savings Balance: <span id="val-savings" class="val-display">$8,000</span></label>
+                                <input type="range" id="input-savings" min="0" max="120000" step="500" value="8000" class="slider">
+                            </div>
+                            <div class="form-group">
+                                <label for="input-missed">Missed Payments (2 yrs): <span id="val-missed" class="val-display">0</span></label>
+                                <input type="range" id="input-missed" min="0" max="10" value="0" class="slider">
+                            </div>
+                            <div class="form-group">
+                                <label for="input-limit">Credit Card Limit: <span id="val-limit" class="val-display">$10,000</span></label>
+                                <input type="range" id="input-limit" min="1000" max="50000" step="500" value="10000" class="slider">
+                            </div>
+                            <div class="form-group">
+                                <label for="input-balance">Credit Card Balance: <span id="val-balance" class="val-display">$3,000</span></label>
+                                <input type="range" id="input-balance" min="0" max="50000" step="100" value="3000" class="slider">
+                            </div>
+                        </div>
+
+                        <!-- Derived Metrics -->
+                        <div class="derived-ratios">
+                            <div class="ratio-box">
+                                <span class="ratio-title">Debt-to-Income</span>
+                                <span id="ratio-dti" class="ratio-value">30.0%</span>
+                            </div>
+                            <div class="ratio-box">
+                                <span class="ratio-title">Utilization Rate</span>
+                                <span id="ratio-util" class="ratio-value">30.0%</span>
+                            </div>
+                            <div class="ratio-box">
+                                <span class="ratio-title">Savings Ratio</span>
+                                <span id="ratio-savings" class="ratio-value">13.3%</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Right: Outcome Dashboard -->
+                <div class="card glass-panel outcome-card">
+                    <div class="card-header">
+                        <h2>Assessment Report</h2>
+                    </div>
+                    <div class="outcome-body">
+                        <!-- Progress Score Circle -->
+                        <div class="score-container">
+                            <svg class="progress-ring" width="180" height="180">
+                                <circle class="progress-ring-bg" stroke="#131e33" stroke-width="12" fill="transparent" r="75" cx="90" cy="90"/>
+                                <circle class="progress-ring-fill" stroke="var(--primary-color)" stroke-width="12" stroke-linecap="round" fill="transparent" r="75" cx="90" cy="90"/>
+                            </svg>
+                            <div class="score-text">
+                                <h3 id="result-score">---</h3>
+                                <p>FICO VALUE</p>
+                                <span id="result-risk-badge" class="risk-badge">N/A</span>
+                            </div>
+                        </div>
+
+                        <!-- Decision Cards -->
+                        <div class="decision-box">
+                            <div class="decision-metric">
+                                <span>Decision Status</span>
+                                <strong id="result-decision">Awaiting</strong>
+                            </div>
+                            <div class="decision-metric">
+                                <span>Probability of Default</span>
+                                <strong id="result-pd">0.0%</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+        
+        <div id="toast-container"></div>
+    </div>
+    
+    <script src="/static/app.js"></script>
+</body>
+</html>
